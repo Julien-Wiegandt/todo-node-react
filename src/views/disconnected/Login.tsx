@@ -1,12 +1,34 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
 import { TextInput } from "../../components/TextInput";
 import { Spacer } from "../../components/Spacer";
 import { Footer } from "../../components/Footer";
+import authServices from "../../services/auth.services";
+import { UserContext } from "../../App";
 
 export function Login(): JSX.Element {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+
+  const { connected, setConnected, currentUser, setCurrentUser } =
+    React.useContext(UserContext);
+
+  const handleLogin = () => {
+    if (email && password) {
+      authServices
+        .login(email, password)
+        .then(() => {
+          console.log("Login success");
+          console.log(authServices.getCurrentUser());
+          setConnected(true);
+        })
+        .catch(() => {
+          console.log("Login failure");
+          setConnected(false);
+        });
+    }
+  };
+
   return (
     <>
       <LoginContainer>
@@ -20,10 +42,11 @@ export function Login(): JSX.Element {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="password"
+          type="password"
         />
         <Spacer height="20%" />
       </LoginContainer>
-      <Footer callback={() => console.log("Click !")} />
+      <Footer callback={handleLogin} />
     </>
   );
 }
