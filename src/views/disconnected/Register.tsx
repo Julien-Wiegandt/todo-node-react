@@ -4,12 +4,13 @@ import { TextInput } from "../../components/TextInput";
 import { Spacer } from "../../components/Spacer";
 import { Footer } from "../../components/Footer";
 
-export function Login(): JSX.Element {
+export function Register(): JSX.Element {
   const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [password1, setPassword1] = useState();
+  const [password2, setPassword2] = useState();
   return (
     <>
-      <LoginContainer>
+      <Container>
         <TextInput
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -17,18 +18,24 @@ export function Login(): JSX.Element {
         />
         <Spacer height="10%" />
         <TextInput
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={password1}
+          onChange={(e) => setPassword1(e.target.value)}
           placeholder="password"
         />
+        <Spacer height="10%" />
+        <TextInput
+          value={password2}
+          onChange={(e) => setPassword2(e.target.value)}
+          placeholder="confirm password"
+        />
         <Spacer height="20%" />
-      </LoginContainer>
+      </Container>
       <Footer callback={() => console.log("Click !")} />
     </>
   );
 }
 
-const LoginContainer = styled.div`
+const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;

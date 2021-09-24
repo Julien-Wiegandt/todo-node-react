@@ -22,6 +22,7 @@ const Input = styled.input`
   width: 219px;
   height: 44px;
   border: none;
+  padding: 0 10px 0 10px;
   /* Text */
   font-style: normal;
   font-weight: normal;
