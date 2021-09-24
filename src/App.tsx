@@ -8,6 +8,9 @@ function App() {
   return <AppContainer>{connected ? <Tasks /> : <Connection />}</AppContainer>;
 }
 
-const AppContainer = styled.div``;
+const AppContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
 export default App;

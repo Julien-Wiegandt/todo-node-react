@@ -20,6 +20,7 @@ export function Navbar(props: props): JSX.Element {
               item.callback();
               setActive(index);
             }}
+            active={index === active}
           >
             {item.title}
             <ItemLine active={index === active} />
@@ -37,8 +38,11 @@ const NavbarContainer = styled.nav`
   background-color: #5f5fc4;
 `;
 
-const NavbarItem = styled.button`
-  /* display: inline-block; */
+type LineProps = {
+  active: boolean;
+};
+
+const NavbarItem = styled.button<LineProps>`
   position: relative;
   height: 100%;
   width: 50%;
@@ -47,7 +51,9 @@ const NavbarItem = styled.button`
   padding: 0;
   /* Text */
   font-style: normal;
-  font-weight: normal;
+  font-weight: ${(props) => {
+    return props.active ? "normal" : "300";
+  }};
   font-size: 20px;
   line-height: 23px;
   color: #ffffff;
@@ -57,9 +63,7 @@ const NavbarItem = styled.button`
     cursor: pointer;
   }
 `;
-type LineProps = {
-  active: boolean;
-};
+
 const ItemLine = styled.div<LineProps>`
   display: ${(props) => {
     return props.active ? "block" : "none";
