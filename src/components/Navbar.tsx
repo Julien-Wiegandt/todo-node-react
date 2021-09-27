@@ -1,41 +1,74 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { ReactComponent as LeftArrowIcon } from "../assets/icons/arrow-left-circle.svg";
+import { ReactComponent as RightArrowIcon } from "../assets/icons/arrow-right-circle-fill.svg";
 
-export interface NavbarItem {
+export interface INavbarItem {
   title: string;
+
   callback: () => unknown;
 }
 
 type props = {
-  items: NavbarItem[];
+  items: INavbarItem[];
+  disableArrows?: boolean;
 };
 export function Navbar(props: props): JSX.Element {
   const [active, setActive] = useState(0);
   return (
-    <NavbarContainer>
-      {props.items.map((item, index) => {
-        return (
-          <NavbarItem
-            onClick={() => {
-              item.callback();
-              setActive(index);
-            }}
-            active={index === active}
+    <MainContainer>
+      <NavbarContainer>
+        {!props.disableArrows && (
+          <LeftArrow
+            href={"#" + active}
+            onClick={() =>
+              setActive(active - 1 < 0 ? active + props.items.length - 1 : active - 1)
+            }
           >
-            {item.title}
-            <ItemLine active={index === active} />
-          </NavbarItem>
-        );
-      })}
-    </NavbarContainer>
+            <LeftArrowIcon />
+          </LeftArrow>
+        )}
+        {props.items.map((item, index) => {
+          return (
+            <NavbarItem
+              key={index}
+              id={"" + index}
+              onClick={() => {
+                item.callback();
+                setActive(index);
+              }}
+              active={index === active}
+            >
+              {item.title}
+              <ItemLine active={index === active} />
+            </NavbarItem>
+          );
+        })}
+        {!props.disableArrows && (
+          <RightArrow
+            href={"#" + active}
+            onClick={() =>
+              setActive(active + 1 > props.items.length - 1 ? 0 : active + 1)
+            }
+          >
+            <RightArrowIcon />
+          </RightArrow>
+        )}
+      </NavbarContainer>
+    </MainContainer>
   );
 }
+const MainContainer = styled.div`
+  position: relative;
+`;
 
 const NavbarContainer = styled.nav`
   overflow: auto;
   white-space: nowrap;
   height: 56px;
   background-color: #5f5fc4;
+  overflow: hidden;
+  scroll-behavior: smooth;
 `;
 
 type LineProps = {
@@ -73,4 +106,36 @@ const ItemLine = styled.div<LineProps>`
   height: 4px;
   width: 100%;
   background-color: #18227c;
+`;
+
+const LeftArrow = styled.a`
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 56px;
+  width: 56px;
+  z-index: 1;
+  svg {
+    height: 30px;
+    width: 30px;
+  }
+`;
+
+const RightArrow = styled.a`
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 56px;
+  width: 56px;
+  z-index: 1;
+  svg {
+    height: 30px;
+    width: 30px;
+  }
 `;

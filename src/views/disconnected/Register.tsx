@@ -4,12 +4,15 @@ import { TextInput } from "../../components/TextInput";
 import { Spacer } from "../../components/Spacer";
 import { Footer } from "../../components/Footer";
 import authServices from "../../services/auth.services";
+import { useHistory } from "react-router";
 
 export function Register(): JSX.Element {
-  const [email, setEmail] = useState();
-  const [password1, setPassword1] = useState();
-  const [password2, setPassword2] = useState();
+  const [email, setEmail] = useState("");
+  const [password1, setPassword1] = useState("");
+  const [password2, setPassword2] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  let history = useHistory();
 
   /**
    * @todo Verify REGEX email and password
@@ -23,6 +26,7 @@ export function Register(): JSX.Element {
             console.log("Register success");
             console.log(authServices.getCurrentUser());
             setPasswordError("");
+            history.push("/");
           })
           .catch(() => {
             console.log("Register failure");

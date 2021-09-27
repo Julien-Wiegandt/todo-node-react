@@ -1,38 +1,39 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Connection } from "./views/disconnected/Connection";
 import { Tasks } from "./views/connected/Tasks";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { connected } from "process";
 
 interface ContexteInterface {
-  connected: boolean;
-  setConnected?: any;
   currentUser?: any;
   setCurrentUser?: any;
 }
 
-export const UserContext = React.createContext<ContexteInterface>({ connected: false });
+export const UserContext = React.createContext<ContexteInterface>({});
 
 const MyProvider = (props: any) => {
-  const [connected, setConnected] = useState(false);
   const [currentUser, setCurrentUser] = useState();
 
   return (
-    <UserContext.Provider
-      value={{ connected, setConnected, currentUser, setCurrentUser }}
-    >
+    <UserContext.Provider value={{ currentUser, setCurrentUser }}>
       {props.children}
     </UserContext.Provider>
   );
 };
 
 function App() {
-  const { connected } = React.useContext(UserContext);
-
   return (
-    <MyProvider>
-      <AppContainer>{connected ? <Tasks /> : <Connection />}</AppContainer>
-    </MyProvider>
+    <Router>
+      <MyProvider>
+        <AppContainer>
+          <Switch>
+            <Route path="/" exact render={() => <Connection />} />
+            <Route path="/tasks" exact render={() => <Tasks />} />
+          </Switch>
+        </AppContainer>
+      </MyProvider>
+    </Router>
   );
 }
 

@@ -4,14 +4,13 @@ import { TextInput } from "../../components/TextInput";
 import { Spacer } from "../../components/Spacer";
 import { Footer } from "../../components/Footer";
 import authServices from "../../services/auth.services";
-import { UserContext } from "../../App";
+import { Redirect, useHistory } from "react-router";
 
 export function Login(): JSX.Element {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const { connected, setConnected, currentUser, setCurrentUser } =
-    React.useContext(UserContext);
+  let history = useHistory();
 
   const handleLogin = () => {
     if (email && password) {
@@ -20,11 +19,10 @@ export function Login(): JSX.Element {
         .then(() => {
           console.log("Login success");
           console.log(authServices.getCurrentUser());
-          setConnected(true);
+          history.push("/tasks");
         })
         .catch(() => {
           console.log("Login failure");
-          setConnected(false);
         });
     }
   };

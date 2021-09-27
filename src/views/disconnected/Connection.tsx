@@ -2,22 +2,28 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Header } from "../../components/Header";
 import { SubHeader } from "../../components/SubHeader";
-import { Navbar, NavbarItem } from "../../components/Navbar";
+import { Navbar, INavbarItem } from "../../components/Navbar";
 import { Login } from "./Login";
-import { Footer } from "../../components/Footer";
 import { Register } from "./Register";
+import { Redirect } from "react-router";
+import authServices from "../../services/auth.services";
 
 export function Connection(): JSX.Element {
+  const currentUser = authServices.getCurrentUser();
   const [isLogin, setIsLogin] = useState(true);
-  const navbarItems: NavbarItem[] = [
+  const navbarItems: INavbarItem[] = [
     { title: "LOGIN", callback: () => setIsLogin(true) },
     { title: "REGISTER", callback: () => setIsLogin(false) },
   ];
+
+  if (currentUser) {
+    return <Redirect to="/tasks/" />;
+  }
   return (
     <ConnectionContainer>
       <Header title="TODO" />
       <SubHeader />
-      <Navbar items={navbarItems} />
+      <Navbar items={navbarItems} disableArrows={true} />
       {isLogin ? <Login /> : <Register />}
     </ConnectionContainer>
   );

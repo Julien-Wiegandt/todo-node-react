@@ -4,11 +4,11 @@ import styled from "styled-components";
 type props = {
   title?: string;
 };
-export function Header(props: props): JSX.Element {
-  return <HeaderContainer>{props.title}</HeaderContainer>;
+export function Header(props: props) {
+  return <Container>{props.title}</Container>;
 }
 
-const HeaderContainer = styled.header`
+const Container = styled.header`
   /* Box */
   display: flex;
   justify-content: center;
