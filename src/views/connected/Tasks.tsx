@@ -5,6 +5,8 @@ import { Header } from "../../components/Header";
 import { SubHeader } from "../../components/SubHeader";
 import { INavbarItem, Navbar } from "../../components/Navbar";
 import authServices from "../../services/auth.services";
+import { Footer } from "../../components/Footer";
+import { ReactComponent as AddIcon } from "../../assets/icons/plus-lg.svg";
 
 export function Tasks(): JSX.Element {
   const currentUser = authServices.getCurrentUser();
@@ -23,8 +25,18 @@ export function Tasks(): JSX.Element {
       <Header title="Tasks"></Header>
       <SubHeader />
       <Navbar items={navbarItems} />
+      <TasksContainer>
+        <p>Tasks</p>
+      </TasksContainer>
+      <Footer callback={() => console.log("click")} icon={<AddIcon />} />
     </Container>
   );
 }
 
 const Container = styled.div``;
+
+const TasksContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;

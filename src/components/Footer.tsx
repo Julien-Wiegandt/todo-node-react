@@ -1,17 +1,15 @@
 import React from "react";
 import styled from "styled-components";
-import { ReactComponent as CheckIcon } from "../assets/icons/bi_check.svg";
 
 type props = {
   callback: () => unknown;
+  icon: JSX.Element;
 };
 export function Footer(props: props) {
   return (
     <Container>
       <Box>
-        <Button onClick={props.callback}>
-          <CheckIcon />
-        </Button>
+        <Button onClick={props.callback}>{props.icon}</Button>
       </Box>
     </Container>
   );
@@ -45,5 +43,10 @@ const Button = styled.button`
     cursor: pointer;
   }
   :active {
+  }
+  svg {
+    height: 26px;
+    width: 26px;
+    color: #ffffff;
   }
 `;
