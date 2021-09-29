@@ -1,7 +1,7 @@
 import axios from "axios";
 import authHeader from "./auth-header";
 
-const API_URL = "http://localhost:8080/api/user/";
+const API_URL = "https://todo-node-express-postgresql.herokuapp.com/api/user";
 
 class UserService {
   getUsers() {
@@ -10,6 +10,10 @@ class UserService {
 
   getUser(id: string) {
     return axios.get(API_URL + "/" + id, { headers: authHeader() });
+  }
+
+  getUserTaskGroups(id: string) {
+    return axios.get(API_URL + "/" + id + "/task-groups", { headers: authHeader() });
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Redirect } from "react-router";
 import { Header } from "../../components/Header";
@@ -7,15 +7,74 @@ import { INavbarItem, Navbar } from "../../components/Navbar";
 import authServices from "../../services/auth.services";
 import { Footer } from "../../components/Footer";
 import { ReactComponent as AddIcon } from "../../assets/icons/plus-lg.svg";
+import { Spacer } from "../../components/Spacer";
+import taskGroupService from "../../services/taskGroup.service";
+import userService from "../../services/user.service";
+import ITaskGroup from "../../models/TaskGroup";
+import ITask from "../../models/Task";
+import { Task } from "../../components/Task";
+import { Line } from "../../components/Line";
 
-export function Tasks(): JSX.Element {
+export function Tasks() {
   const currentUser = authServices.getCurrentUser();
-  const [currentTaskGroup, setCurrentTaskGroup] = useState(0);
-  const navbarItems: INavbarItem[] = [
-    { title: "GROUP 1", callback: () => setCurrentTaskGroup(0) },
-    { title: "GROUP 2", callback: () => setCurrentTaskGroup(1) },
-    { title: "GROUP 3", callback: () => setCurrentTaskGroup(2) },
-  ];
+  const [taskGroups, setTaskGroups] = useState<ITaskGroup[]>([]);
+  const [currentTaskGroup, setCurrentTaskGroup] = useState(-1);
+  const [tasks, setTasks] = useState<ITask[]>([]);
+
+  // GET USER'S TASKGROUPS
+  useEffect(() => {
+    userService
+      .getUserTaskGroups(currentUser.id)
+      .then((res) => {
+        setTaskGroups(res.data);
+        setCurrentTaskGroup(res.data[0].id);
+      })
+      .catch((err) => {
+        console.log("getUserTaskGroups failure : ", err);
+      });
+  }, []);
+
+  let navbarItems: INavbarItem[] = [];
+  taskGroups.forEach((taskGroup) => {
+    navbarItems.push({
+      title: taskGroup.title,
+      callback: () => setCurrentTaskGroup(taskGroup.id),
+    });
+  });
+
+  // GET CURRENT TASKGROUP'S TASKS
+  useEffect(() => {
+    if (currentTaskGroup !== -1)
+      taskGroupService
+        .getTaskGroupTasks(currentTaskGroup)
+        .then((res) => {
+          setTasks(res.data);
+        })
+        .catch((err) => {
+          console.log("getTaskGroupTasks failed : ", err);
+        });
+  }, [currentTaskGroup]);
+
+  // UPDATE TASK
+  const changeTaskToDone = (task: ITask) => {
+    const tempTasks = tasks.map((taskItem) => {
+      if (taskItem.id === task.id) {
+        taskItem.done = true;
+      }
+      return taskItem;
+    });
+    setTasks(tempTasks);
+  };
+
+  const changeTaskToDo = (task: ITask) => {
+    const tempTasks = tasks.map((taskItem) => {
+      if (taskItem.id === task.id) {
+        taskItem.done = false;
+      }
+      return taskItem;
+    });
+    setTasks(tempTasks);
+  };
 
   if (!currentUser) {
     return <Redirect to="/" />;
@@ -26,7 +85,17 @@ export function Tasks(): JSX.Element {
       <SubHeader />
       <Navbar items={navbarItems} />
       <TasksContainer>
-        <p>Tasks</p>
+        <Spacer height="20px" />
+        {tasks.map((task) => {
+          if (!task.done) return <Task toggleTask={changeTaskToDone} task={task} />;
+        })}
+        <Spacer height="20px" />
+        <Line />
+        <Spacer height="20px" />
+        {tasks.map((task) => {
+          if (task.done) return <Task toggleTask={changeTaskToDo} task={task} />;
+        })}
+        <Spacer height="100%" />
       </TasksContainer>
       <Footer callback={() => console.log("click")} icon={<AddIcon />} />
     </Container>

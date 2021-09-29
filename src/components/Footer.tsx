@@ -16,8 +16,8 @@ export function Footer(props: props) {
 }
 
 const Container = styled.footer`
-  /* position: fixed;
-  bottom: 0; */
+  position: fixed;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   width: 100%;

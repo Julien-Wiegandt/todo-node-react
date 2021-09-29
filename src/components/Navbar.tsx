@@ -11,14 +11,13 @@ export interface INavbarItem {
 
 type props = {
   items: INavbarItem[];
-  disableArrows?: boolean;
 };
 export function Navbar(props: props): JSX.Element {
   const [active, setActive] = useState(0);
   return (
     <MainContainer>
       <NavbarContainer>
-        {!props.disableArrows && (
+        {props.items.length > 2 && (
           <LeftArrow
             href={"#" + active}
             onClick={() =>
@@ -44,7 +43,7 @@ export function Navbar(props: props): JSX.Element {
             </NavbarItem>
           );
         })}
-        {!props.disableArrows && (
+        {props.items.length > 2 && (
           <RightArrow
             href={"#" + active}
             onClick={() =>

@@ -23,7 +23,7 @@ export function Connection(): JSX.Element {
     <ConnectionContainer>
       <Header title="TODO" />
       <SubHeader />
-      <Navbar items={navbarItems} disableArrows={true} />
+      <Navbar items={navbarItems} />
       {isLogin ? <Login /> : <Register />}
     </ConnectionContainer>
   );
