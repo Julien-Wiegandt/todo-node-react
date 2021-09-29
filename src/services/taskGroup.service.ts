@@ -1,7 +1,7 @@
 import axios from "axios";
 import authHeader from "./auth-header";
 
-const API_URL = "https://todo-node-express-postgresql.herokuapp.com/api/task-group";
+const API_URL = process.env.REACT_APP_API_URL + "/api/task-group";
 
 class TaskGroupService {
   /**
@@ -15,7 +15,7 @@ class TaskGroupService {
   }
 
   /**
-   * Retrieve all TaskGroups owned by the logged in User
+   * Retrieve all TaskGroups, Admin only
    * @returns TaskGroups
    */
   getTaskGroups() {
@@ -36,6 +36,7 @@ class TaskGroupService {
    * @returns Tasks
    */
   getTaskGroupTasks(id: number) {
+    console.log(authHeader());
     return axios.get(API_URL + "/" + id + "/tasks", { headers: authHeader() });
   }
 
@@ -45,8 +46,8 @@ class TaskGroupService {
    * @param payload TaskGroup body
    * @returns The new TaskGroup
    */
-  putTaskGroup(id: number, payload: object) {
-    return axios.put(API_URL + "/" + id, { headers: authHeader(), body: payload });
+  updateTaskGroup(id: number, payload: object) {
+    return axios.put(API_URL + "/" + id, payload, { headers: authHeader() });
   }
 
   /**

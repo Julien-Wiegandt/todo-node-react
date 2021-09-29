@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://todo-node-express-postgresql.herokuapp.com/api/user/";
+const API_URL = process.env.REACT_APP_API_URL + "/api/user/";
 
 class AuthService {
   login(email: string, password: string) {

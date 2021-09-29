@@ -14,6 +14,7 @@ import ITaskGroup from "../../models/TaskGroup";
 import ITask from "../../models/Task";
 import { Task } from "../../components/Task";
 import { Line } from "../../components/Line";
+import taskService from "../../services/task.service";
 
 export function Tasks() {
   const currentUser = authServices.getCurrentUser();
@@ -57,23 +58,43 @@ export function Tasks() {
 
   // UPDATE TASK
   const changeTaskToDone = (task: ITask) => {
-    const tempTasks = tasks.map((taskItem) => {
-      if (taskItem.id === task.id) {
-        taskItem.done = true;
-      }
-      return taskItem;
-    });
-    setTasks(tempTasks);
+    const payload = {
+      done: true,
+    };
+    taskService
+      .updateTask(task.id, payload)
+      .then((res) => {
+        const tempTasks = tasks.map((taskItem) => {
+          if (taskItem.id === task.id) {
+            taskItem.done = true;
+          }
+          return taskItem;
+        });
+        setTasks(tempTasks);
+      })
+      .catch((err) => {
+        console.log("updateTask failed : ", err);
+      });
   };
 
   const changeTaskToDo = (task: ITask) => {
-    const tempTasks = tasks.map((taskItem) => {
-      if (taskItem.id === task.id) {
-        taskItem.done = false;
-      }
-      return taskItem;
-    });
-    setTasks(tempTasks);
+    const payload = {
+      done: false,
+    };
+    taskService
+      .updateTask(task.id, payload)
+      .then((res) => {
+        const tempTasks = tasks.map((taskItem) => {
+          if (taskItem.id === task.id) {
+            taskItem.done = false;
+          }
+          return taskItem;
+        });
+        setTasks(tempTasks);
+      })
+      .catch((err) => {
+        console.log("updateTask failed : ", err);
+      });
   };
 
   if (!currentUser) {
@@ -87,13 +108,15 @@ export function Tasks() {
       <TasksContainer>
         <Spacer height="20px" />
         {tasks.map((task) => {
-          if (!task.done) return <Task toggleTask={changeTaskToDone} task={task} />;
+          if (!task.done)
+            return <Task key={task.id} toggleTask={changeTaskToDone} task={task} />;
         })}
         <Spacer height="20px" />
         <Line />
         <Spacer height="20px" />
         {tasks.map((task) => {
-          if (task.done) return <Task toggleTask={changeTaskToDo} task={task} />;
+          if (task.done)
+            return <Task key={task.id} toggleTask={changeTaskToDo} task={task} />;
         })}
         <Spacer height="100%" />
       </TasksContainer>
