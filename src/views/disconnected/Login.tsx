@@ -5,7 +5,7 @@ import { Spacer } from "../../components/Spacer";
 import { Footer } from "../../components/Footer";
 import authServices from "../../services/auth.services";
 import { useHistory } from "react-router";
-import { ReactComponent as CheckIcon } from "../../assets/icons/check-lg.svg";
+import { CheckIconLg } from "../../assets/icons/icons";
 
 export function Login(): JSX.Element {
   const [email, setEmail] = useState("");
@@ -45,7 +45,7 @@ export function Login(): JSX.Element {
         />
         <Spacer height="20%" />
       </LoginContainer>
-      <Footer callback={handleLogin} icon={<CheckIcon />} />
+      <Footer callback={handleLogin} icon={<CheckIconLg />}></Footer>
     </>
   );
 }

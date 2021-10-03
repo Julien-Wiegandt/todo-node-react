@@ -2,14 +2,19 @@ import React from "react";
 import styled from "styled-components";
 
 type props = {
+  children?: JSX.Element;
   callback: () => unknown;
   icon: JSX.Element;
+  hideFooterButton?: boolean;
 };
 export function Footer(props: props) {
   return (
     <Container>
       <Box>
-        <Button onClick={props.callback}>{props.icon}</Button>
+        <Button visible={!props.hideFooterButton} onClick={props.callback}>
+          {props.icon}
+        </Button>
+        {props.children}
       </Box>
     </Container>
   );
@@ -28,7 +33,14 @@ const Box = styled.div`
   height: 48px;
   background-color: #5f5fc4;
 `;
-const Button = styled.button`
+
+type ButtonProps = {
+  visible?: boolean;
+};
+const Button = styled.button<ButtonProps>`
+  display: ${(props) => {
+    return props.visible ? "block" : "none";
+  }};
   position: absolute;
   left: calc(50% - 28px);
   top: -28px;

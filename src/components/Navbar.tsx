@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { ReactComponent as LeftArrowIcon } from "../assets/icons/arrow-left-circle.svg";
-import { ReactComponent as RightArrowIcon } from "../assets/icons/arrow-right-circle-fill.svg";
+import { LeftArrowIcon, RightArrowIcon } from "../assets/icons/icons";
 
 export interface INavbarItem {
   title: string;

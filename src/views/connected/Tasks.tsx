@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Redirect } from "react-router";
 import { Header } from "../../components/Header";
@@ -6,8 +6,6 @@ import { SubHeader } from "../../components/SubHeader";
 import { INavbarItem, Navbar } from "../../components/Navbar";
 import authServices from "../../services/auth.services";
 import { Footer } from "../../components/Footer";
-import { ReactComponent as AddIcon } from "../../assets/icons/plus-lg.svg";
-import { Spacer } from "../../components/Spacer";
 import taskGroupService from "../../services/taskGroup.service";
 import userService from "../../services/user.service";
 import ITaskGroup from "../../models/TaskGroup";
@@ -15,6 +13,8 @@ import ITask from "../../models/Task";
 import { Task } from "../../components/Task";
 import { Line } from "../../components/Line";
 import taskService from "../../services/task.service";
+import { AddIcon, ListMenu, VerticalDots } from "../../assets/icons/icons";
+import { Spacer } from "../../components/Spacer";
 
 export function Tasks() {
   const currentUser = authServices.getCurrentUser();
@@ -22,6 +22,8 @@ export function Tasks() {
   const [currentTaskGroup, setCurrentTaskGroup] = useState(-1);
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [toAddTasks, setToAddTasks] = useState<ITask[]>([]);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [hideFooterButton, setHideFooterButton] = useState(false);
 
   // GET USER'S TASKGROUPS
   useEffect(() => {
@@ -34,7 +36,7 @@ export function Tasks() {
       .catch((err) => {
         console.log("getUserTaskGroups failure : ", err);
       });
-  }, []);
+  }, [currentUser.id]);
 
   let navbarItems: INavbarItem[] = [];
   taskGroups.forEach((taskGroup) => {
@@ -110,6 +112,7 @@ export function Tasks() {
         // DELETE Task from local temp array
         const filtered = toAddTasks.filter((tempTask) => {
           if (tempTask.id !== task.id) return tempTask;
+          return false;
         });
         setToAddTasks(filtered);
       })
@@ -118,13 +121,17 @@ export function Tasks() {
       });
   };
 
+  /**
+   * Handle toggle done task
+   * @param task
+   */
   const changeTaskToDo = (task: ITask) => {
     const payload = {
       done: false,
     };
     taskService
       .updateTask(task.id, payload)
-      .then((res) => {
+      .then(() => {
         const tempTasks = tasks.map((taskItem) => {
           if (taskItem.id === task.id) {
             taskItem.done = false;
@@ -138,18 +145,23 @@ export function Tasks() {
       });
   };
 
+  const handleLeftMenuOpen = () => {
+    setDropdownVisible(!dropdownVisible);
+    setHideFooterButton(!hideFooterButton);
+  };
+
   if (!currentUser) {
     return <Redirect to="/" />;
   }
   return (
     <Container>
-      <div>
+      <HeaderContainer>
         <Header title="Tasks"></Header>
         <SubHeader />
         <Navbar items={navbarItems} />
-      </div>
+      </HeaderContainer>
       <TasksContainer>
-        <Spacer height="20px" />
+        <Spacer height="181px" />
         {toAddTasks.map((task) => {
           return (
             <Task
@@ -164,6 +176,7 @@ export function Tasks() {
         {tasks.map((task) => {
           if (!task.done)
             return <Task key={task.id} toggleTask={changeTaskToDone} task={task} />;
+          return false;
         })}
         <Spacer height="20px" />
         <Line />
@@ -171,18 +184,125 @@ export function Tasks() {
         {tasks.map((task) => {
           if (task.done)
             return <Task key={task.id} toggleTask={changeTaskToDo} task={task} />;
+          return false;
         })}
         <Spacer height="60px" />
       </TasksContainer>
-      <Footer callback={handleTempTaskAdd} icon={<AddIcon />} />
+      <Footer
+        hideFooterButton={hideFooterButton}
+        callback={handleTempTaskAdd}
+        icon={<AddIcon />}
+      >
+        <FooterContainer>
+          <DropdownMenu visible={dropdownVisible}>
+            {taskGroups.map((group) => {
+              if (group.id === currentTaskGroup)
+                return (
+                  <DropdownButton
+                    active={true}
+                    onClick={() => setCurrentTaskGroup(group.id)}
+                  >
+                    {group.title}
+                  </DropdownButton>
+                );
+              return (
+                <DropdownButton onClick={() => setCurrentTaskGroup(group.id)}>
+                  {group.title}
+                </DropdownButton>
+              );
+            })}
+            <Line />
+            <DropdownButton>Add a list</DropdownButton>
+          </DropdownMenu>
+          <IconButton onClick={handleLeftMenuOpen}>
+            <ListMenu />
+          </IconButton>
+          <IconButton>
+            <VerticalDots />
+          </IconButton>
+        </FooterContainer>
+      </Footer>
     </Container>
   );
 }
 
-const Container = styled.div``;
+const Container = styled.div`
+  background-color: #f5f5f6;
+  width: 100%;
+`;
 
-const TasksContainer = styled.div`
+const TasksContainer = styled.main`
   display: flex;
   flex-direction: column;
+`;
+
+const HeaderContainer = styled.header`
+  position: fixed;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const FooterContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   height: 100%;
+`;
+
+const IconButton = styled.button`
+  border: none;
+  background-color: transparent;
+  position: relative;
+
+  svg {
+    width: 26px;
+    height: 26px;
+    color: #ffffff;
+  }
+  :hover {
+    cursor: pointer;
+  }
+`;
+
+type DropDownProps = {
+  visible: boolean;
+};
+
+const DropdownMenu = styled.div<DropDownProps>`
+  display: ${(props) => {
+    return props.visible ? "flex" : "none";
+  }};
+  position: absolute;
+  left: 0px;
+  bottom: 48px;
+  width: 100%;
+  flex-direction: column;
+  background-color: #5f5fc4;
+`;
+
+type DropdownButtonProps = {
+  active?: boolean;
+};
+
+const DropdownButton = styled.button<DropdownButtonProps>`
+  border: none;
+  padding: 8px;
+  background-color: ${(props) => {
+    return props.active ? "#5f5fc4" : "#FFFFFF";
+  }};
+  /* Text */
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 1px;
+  color: ${(props) => {
+    return props.active ? "#FFFFFF" : "#000000";
+  }};
+  :hover {
+    cursor: pointer;
+    opacity: 0.8;
+  }
 `;

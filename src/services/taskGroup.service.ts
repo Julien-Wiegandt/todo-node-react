@@ -36,7 +36,6 @@ class TaskGroupService {
    * @returns Tasks
    */
   getTaskGroupTasks(id: number) {
-    console.log(authHeader());
     return axios.get(API_URL + "/" + id + "/tasks", { headers: authHeader() });
   }
 

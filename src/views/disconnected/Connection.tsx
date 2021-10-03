@@ -33,4 +33,5 @@ const ConnectionContainer = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+  background-color: #f5f5f6;
 `;

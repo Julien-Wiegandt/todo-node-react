@@ -1,9 +1,7 @@
-import React, { FormEvent, FormEventHandler, useEffect, useRef, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import styled from "styled-components";
-import { ReactComponent as CheckIcon } from "../assets/icons/check2.svg";
-import { ReactComponent as CircleIcon } from "../assets/icons/circle.svg";
+import { CheckIcon, CircleIcon } from "../assets/icons/icons";
 import ITask from "../models/Task";
-import { Spacer } from "./Spacer";
 
 type props = {
   task: ITask;
@@ -22,11 +20,11 @@ export function Task(props: props) {
   };
   return (
     <Container>
-      <Spacer width="5%" />
+      {/* <Spacer width="5%" /> */}
       <Button onClick={() => props.toggleTask(props.task)}>
         {props.task.done ? <CheckIcon /> : <CircleIcon />}
       </Button>
-      <Spacer width="20px" />
+      {/* <Spacer width="20px" /> */}
       {props.editMode ? (
         <form onSubmit={(event) => handleAddTask(event)}>
           <Input
@@ -48,6 +46,7 @@ const Container = styled.div`
   justify-content: flex-start;
   align-items: center;
   padding: 5px;
+  overflow: hidden;
 `;
 
 const Button = styled.button`
@@ -61,6 +60,10 @@ const Button = styled.button`
 type StylePorps = {
   done: boolean;
 };
+
+/**
+ * @todo : Bug avec les tres long titre d'un seul mot
+ */
 const Title = styled.p<StylePorps>`
   ${(props) => {
     return props.done && "text-decoration-line: line-through";
