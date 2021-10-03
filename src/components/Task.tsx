@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FormEvent, FormEventHandler, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { ReactComponent as CheckIcon } from "../assets/icons/check2.svg";
 import { ReactComponent as CircleIcon } from "../assets/icons/circle.svg";
@@ -8,9 +8,18 @@ import { Spacer } from "./Spacer";
 type props = {
   task: ITask;
   toggleTask: (task: ITask) => unknown;
+  editMode?: boolean;
+  handleAddTask?: (task: ITask) => unknown;
 };
 
 export function Task(props: props) {
+  const [title, setTitle] = useState(props.task.title);
+
+  const handleAddTask = (e: FormEvent) => {
+    e.preventDefault();
+    props.task.title = title;
+    props.handleAddTask && props.handleAddTask(props.task);
+  };
   return (
     <Container>
       <Spacer width="5%" />
@@ -18,7 +27,18 @@ export function Task(props: props) {
         {props.task.done ? <CheckIcon /> : <CircleIcon />}
       </Button>
       <Spacer width="20px" />
-      <Title done={props.task.done}>{props.task.title}</Title>
+      {props.editMode ? (
+        <form onSubmit={(event) => handleAddTask(event)}>
+          <Input
+            type="text"
+            autoFocus
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
+        </form>
+      ) : (
+        <Title done={props.task.done}>{props.task.title}</Title>
+      )}
     </Container>
   );
 }
@@ -50,4 +70,20 @@ const Title = styled.p<StylePorps>`
   font-size: 14px;
   line-height: 16px;
   color: #18227c;
+`;
+
+const Input = styled.input`
+  border: none;
+  border-bottom: 1px solid #18227c;
+  margin: 0;
+  height: 21px;
+  background-color: transparent;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  color: #18227c;
+
+  :focus {
+    outline: 0;
+  }
 `;

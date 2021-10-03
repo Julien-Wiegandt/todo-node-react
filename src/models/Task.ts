@@ -6,4 +6,9 @@ interface ITask {
   done: boolean;
 }
 
+export interface ITaskPayload {
+  title: string;
+  done: boolean;
+}
+
 export default ITask;

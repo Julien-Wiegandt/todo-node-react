@@ -11,7 +11,7 @@ class TaskService {
    * @returns a Task
    */
   createTask(id: number, payload: object) {
-    return axios.post(API_URL + "/" + id, { headers: authHeader(), body: payload });
+    return axios.post(API_URL + "/" + id, payload, { headers: authHeader() });
   }
 
   /**

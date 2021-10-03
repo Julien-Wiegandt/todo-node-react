@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { Connection } from "./views/disconnected/Connection";
 import { Tasks } from "./views/connected/Tasks";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { connected } from "process";
 
 interface ContexteInterface {
   currentUser?: any;

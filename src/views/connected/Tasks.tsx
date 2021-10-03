@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Redirect } from "react-router";
 import { Header } from "../../components/Header";
@@ -21,6 +21,7 @@ export function Tasks() {
   const [taskGroups, setTaskGroups] = useState<ITaskGroup[]>([]);
   const [currentTaskGroup, setCurrentTaskGroup] = useState(-1);
   const [tasks, setTasks] = useState<ITask[]>([]);
+  const [toAddTasks, setToAddTasks] = useState<ITask[]>([]);
 
   // GET USER'S TASKGROUPS
   useEffect(() => {
@@ -49,7 +50,11 @@ export function Tasks() {
       taskGroupService
         .getTaskGroupTasks(currentTaskGroup)
         .then((res) => {
-          setTasks(res.data);
+          let data = res.data;
+          data.sort((a: ITask, b: ITask) => {
+            return b.id - a.id;
+          });
+          setTasks(data);
         })
         .catch((err) => {
           console.log("getTaskGroupTasks failed : ", err);
@@ -74,6 +79,42 @@ export function Tasks() {
       })
       .catch((err) => {
         console.log("updateTask failed : ", err);
+      });
+  };
+
+  // ADD TEMP TASK
+  const handleTempTaskAdd = () => {
+    const task: ITask = {
+      id: (toAddTasks.length + 1) * -1,
+      title: "",
+      done: false,
+    };
+    const temp = [...toAddTasks];
+    temp.unshift(task);
+    setToAddTasks(temp);
+  };
+
+  // ADD TASK
+  const handleAddTask = (task: ITask) => {
+    const payload = {
+      title: task.title,
+      done: task.done,
+    };
+    taskService
+      .createTask(currentTaskGroup, payload)
+      .then((res) => {
+        // ADD Task to local array
+        const temp = [...tasks];
+        temp.unshift(res.data);
+        setTasks(temp);
+        // DELETE Task from local temp array
+        const filtered = toAddTasks.filter((tempTask) => {
+          if (tempTask.id !== task.id) return tempTask;
+        });
+        setToAddTasks(filtered);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
 
@@ -102,11 +143,24 @@ export function Tasks() {
   }
   return (
     <Container>
-      <Header title="Tasks"></Header>
-      <SubHeader />
-      <Navbar items={navbarItems} />
+      <div>
+        <Header title="Tasks"></Header>
+        <SubHeader />
+        <Navbar items={navbarItems} />
+      </div>
       <TasksContainer>
         <Spacer height="20px" />
+        {toAddTasks.map((task) => {
+          return (
+            <Task
+              key={task.id}
+              editMode={true}
+              handleAddTask={handleAddTask}
+              toggleTask={() => console.log("nop")}
+              task={task}
+            />
+          );
+        })}
         {tasks.map((task) => {
           if (!task.done)
             return <Task key={task.id} toggleTask={changeTaskToDone} task={task} />;
@@ -118,9 +172,9 @@ export function Tasks() {
           if (task.done)
             return <Task key={task.id} toggleTask={changeTaskToDo} task={task} />;
         })}
-        <Spacer height="100%" />
+        <Spacer height="60px" />
       </TasksContainer>
-      <Footer callback={() => console.log("click")} icon={<AddIcon />} />
+      <Footer callback={handleTempTaskAdd} icon={<AddIcon />} />
     </Container>
   );
 }
