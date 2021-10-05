@@ -28,10 +28,10 @@ export function Tasks() {
   const [modalOpen, setModalOpen] = useState(false);
   const [navbarItems, setNavbarItems] = useState<INavbarItem[]>([]);
   const [currentTaskGroupIndex, setCurrentTaskGroupIndex] = useState(0);
+  const [probablyOutdatedToken, setProbablyOutdatedToken] = useState(false);
 
   // GET USER'S TASKGROUPS
   useEffect(() => {
-    console.log(currentUser);
     if (currentUser) {
       userService
         .getUserTaskGroups(currentUser.id)
@@ -40,7 +40,15 @@ export function Tasks() {
           setCurrentTaskGroup(res.data[0].id);
         })
         .catch((err) => {
-          console.log("getUserTaskGroups failure : ", err);
+          const errTab = err.message.split(" ");
+          const status = errTab[errTab.length - 1];
+          switch (status) {
+            case "401":
+              setProbablyOutdatedToken(true);
+              break;
+            default:
+              break;
+          }
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,6 +80,15 @@ export function Tasks() {
         })
         .catch((err) => {
           console.log("getTaskGroupTasks failed : ", err);
+          const errTab = err.message.split(" ");
+          const status = errTab[errTab.length - 1];
+          switch (status) {
+            case "401":
+              setProbablyOutdatedToken(true);
+              break;
+            default:
+              break;
+          }
         });
     let currentIndex = 0;
     taskGroups.forEach((taskGroup, index) => {
@@ -176,7 +193,9 @@ export function Tasks() {
     taskGroupService
       .createTaskGroup(currentUser.id, payload)
       .then((res) => {
-        taskGroups.push(res.data);
+        let temp = [...taskGroups];
+        temp.push(res.data);
+        setTaskGroups(temp);
         setModalOpen(false);
         setTaskGroupTitle("");
       })
@@ -185,7 +204,7 @@ export function Tasks() {
       });
   };
 
-  if (!currentUser) {
+  if (!currentUser || probablyOutdatedToken) {
     return <Redirect to="/" />;
   }
   return (
