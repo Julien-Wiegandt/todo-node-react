@@ -10,6 +10,8 @@ import { CheckIconLg } from "../../assets/icons/icons";
 export function Login(): JSX.Element {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   let history = useHistory();
 
@@ -20,11 +22,38 @@ export function Login(): JSX.Element {
         .then(() => {
           console.log("Login success");
           console.log(authServices.getCurrentUser());
+          setEmailError("");
+          setPasswordError("");
           history.push("/tasks");
         })
-        .catch(() => {
-          console.log("Login failure");
+        .catch((err) => {
+          const errTab = err.message.split(" ");
+          const status = errTab[errTab.length - 1];
+          switch (status) {
+            case "401":
+              setEmailError("");
+              setPasswordError("incorrect password");
+              break;
+            case "404":
+              setEmailError("email not found");
+              setPasswordError("");
+              break;
+
+            default:
+              break;
+          }
         });
+    } else {
+      if (!email && !password) {
+        setEmailError("empty email");
+        setPasswordError("empty password");
+      } else if (!email) {
+        setEmailError("empty email");
+        setPasswordError("");
+      } else if (!password) {
+        setEmailError("");
+        setPasswordError("empty password");
+      }
     }
   };
 
@@ -35,6 +64,7 @@ export function Login(): JSX.Element {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="email"
+          error={emailError}
         />
         <Spacer height="10%" />
         <TextInput
@@ -42,6 +72,7 @@ export function Login(): JSX.Element {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="password"
           type="password"
+          error={passwordError}
         />
         <Spacer height="20%" />
       </LoginContainer>

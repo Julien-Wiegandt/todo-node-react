@@ -27,16 +27,18 @@ export function Tasks() {
 
   // GET USER'S TASKGROUPS
   useEffect(() => {
-    userService
-      .getUserTaskGroups(currentUser.id)
-      .then((res) => {
-        setTaskGroups(res.data);
-        setCurrentTaskGroup(res.data[0].id);
-      })
-      .catch((err) => {
-        console.log("getUserTaskGroups failure : ", err);
-      });
-  }, [currentUser.id]);
+    if (currentUser) {
+      userService
+        .getUserTaskGroups(currentUser.id)
+        .then((res) => {
+          setTaskGroups(res.data);
+          setCurrentTaskGroup(res.data[0].id);
+        })
+        .catch((err) => {
+          console.log("getUserTaskGroups failure : ", err);
+        });
+    }
+  }, [currentUser]);
 
   let navbarItems: INavbarItem[] = [];
   taskGroups.forEach((taskGroup) => {
@@ -179,7 +181,7 @@ export function Tasks() {
           return false;
         })}
         <Spacer height="20px" />
-        <Line />
+        {tasks.length > 0 && <Line />}
         <Spacer height="20px" />
         {tasks.map((task) => {
           if (task.done)
@@ -199,6 +201,7 @@ export function Tasks() {
               if (group.id === currentTaskGroup)
                 return (
                   <DropdownButton
+                    key={group.id}
                     active={true}
                     onClick={() => setCurrentTaskGroup(group.id)}
                   >
@@ -206,7 +209,10 @@ export function Tasks() {
                   </DropdownButton>
                 );
               return (
-                <DropdownButton onClick={() => setCurrentTaskGroup(group.id)}>
+                <DropdownButton
+                  key={group.id}
+                  onClick={() => setCurrentTaskGroup(group.id)}
+                >
                   {group.title}
                 </DropdownButton>
               );
@@ -227,7 +233,6 @@ export function Tasks() {
 }
 
 const Container = styled.div`
-  background-color: #f5f5f6;
   width: 100%;
 `;
 
