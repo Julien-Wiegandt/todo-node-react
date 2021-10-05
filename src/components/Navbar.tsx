@@ -72,11 +72,16 @@ const MainContainer = styled.div`
 `;
 
 const NavbarContainer = styled.nav`
-  overflow: auto;
+  overflow: scroll;
+
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
   white-space: nowrap;
   height: 56px;
   background-color: #5f5fc4;
-  overflow: hidden;
   scroll-behavior: smooth;
 `;
 
@@ -131,6 +136,9 @@ const LeftArrow = styled.a`
     height: 30px;
     width: 30px;
   }
+  @media screen and (max-width: 414px) {
+    display: none;
+  }
 `;
 
 const RightArrow = styled.a`
@@ -146,5 +154,8 @@ const RightArrow = styled.a`
   svg {
     height: 30px;
     width: 30px;
+  }
+  @media screen and (max-width: 414px) {
+    display: none;
   }
 `;
