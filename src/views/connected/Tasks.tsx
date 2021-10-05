@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Redirect } from "react-router";
 import { Header } from "../../components/Header";
@@ -15,6 +15,7 @@ import { Line } from "../../components/Line";
 import taskService from "../../services/task.service";
 import { AddIcon, ListMenu, VerticalDots } from "../../assets/icons/icons";
 import { Spacer } from "../../components/Spacer";
+import { Modal } from "../../components/Modal";
 
 export function Tasks() {
   const currentUser = authServices.getCurrentUser();
@@ -24,9 +25,13 @@ export function Tasks() {
   const [toAddTasks, setToAddTasks] = useState<ITask[]>([]);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [hideFooterButton, setHideFooterButton] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [navbarItems, setNavbarItems] = useState<INavbarItem[]>([]);
+  const [currentTaskGroupIndex, setCurrentTaskGroupIndex] = useState(0);
 
   // GET USER'S TASKGROUPS
   useEffect(() => {
+    console.log(currentUser);
     if (currentUser) {
       userService
         .getUserTaskGroups(currentUser.id)
@@ -38,15 +43,20 @@ export function Tasks() {
           console.log("getUserTaskGroups failure : ", err);
         });
     }
-  }, [currentUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  let navbarItems: INavbarItem[] = [];
-  taskGroups.forEach((taskGroup) => {
-    navbarItems.push({
-      title: taskGroup.title,
-      callback: () => setCurrentTaskGroup(taskGroup.id),
+  useEffect(() => {
+    let temp: INavbarItem[] = [];
+    taskGroups.forEach((taskGroup) => {
+      temp.push({
+        title: taskGroup.title,
+        id: taskGroup.id,
+        callback: () => setCurrentTaskGroup(taskGroup.id),
+      });
     });
-  });
+    setNavbarItems(temp);
+  }, [taskGroups]);
 
   // GET CURRENT TASKGROUP'S TASKS
   useEffect(() => {
@@ -63,6 +73,12 @@ export function Tasks() {
         .catch((err) => {
           console.log("getTaskGroupTasks failed : ", err);
         });
+    let currentIndex = 0;
+    taskGroups.forEach((taskGroup, index) => {
+      if (taskGroup.id === currentTaskGroup) currentIndex = index;
+    });
+    setCurrentTaskGroupIndex(currentIndex);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTaskGroup]);
 
   // UPDATE TASK
@@ -152,6 +168,23 @@ export function Tasks() {
     setHideFooterButton(!hideFooterButton);
   };
 
+  //Handle Add a TaskGroup
+  const [taskGroupTitle, setTaskGroupTitle] = useState("");
+  const handleAddTaskGroup = (event: FormEvent) => {
+    event.preventDefault();
+    const payload = { title: taskGroupTitle };
+    taskGroupService
+      .createTaskGroup(currentUser.id, payload)
+      .then((res) => {
+        taskGroups.push(res.data);
+        setModalOpen(false);
+        setTaskGroupTitle("");
+      })
+      .catch((err) => {
+        console.log("add TaskGroup failed : ", err);
+      });
+  };
+
   if (!currentUser) {
     return <Redirect to="/" />;
   }
@@ -160,7 +193,7 @@ export function Tasks() {
       <HeaderContainer>
         <Header title="Tasks"></Header>
         <SubHeader />
-        <Navbar items={navbarItems} />
+        <Navbar items={navbarItems} currentTaskGroup={currentTaskGroupIndex} />
       </HeaderContainer>
       <TasksContainer>
         <Spacer height="181px" />
@@ -197,13 +230,14 @@ export function Tasks() {
       >
         <FooterContainer>
           <DropdownMenu visible={dropdownVisible}>
-            {taskGroups.map((group) => {
+            {taskGroups.map((group, index) => {
               if (group.id === currentTaskGroup)
                 return (
                   <DropdownButton
                     key={group.id}
                     active={true}
                     onClick={() => setCurrentTaskGroup(group.id)}
+                    href={"#" + index}
                   >
                     {group.title}
                   </DropdownButton>
@@ -212,13 +246,24 @@ export function Tasks() {
                 <DropdownButton
                   key={group.id}
                   onClick={() => setCurrentTaskGroup(group.id)}
+                  href={"#" + index}
                 >
                   {group.title}
                 </DropdownButton>
               );
             })}
             <Line />
-            <DropdownButton>Add a list</DropdownButton>
+            <DropdownButton onClick={() => setModalOpen(true)}>Add a list</DropdownButton>
+            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} width="30%">
+              <form onSubmit={(event) => handleAddTaskGroup(event)}>
+                <Input
+                  type="text"
+                  autoFocus
+                  value={taskGroupTitle}
+                  onChange={(event) => setTaskGroupTitle(event.target.value)}
+                />
+              </form>
+            </Modal>
           </DropdownMenu>
           <IconButton onClick={handleLeftMenuOpen}>
             <ListMenu />
@@ -291,13 +336,16 @@ type DropdownButtonProps = {
   active?: boolean;
 };
 
-const DropdownButton = styled.button<DropdownButtonProps>`
+const DropdownButton = styled.a<DropdownButtonProps>`
+  display: flex;
+  justify-content: center;
   border: none;
   padding: 8px;
   background-color: ${(props) => {
     return props.active ? "#5f5fc4" : "#FFFFFF";
   }};
   /* Text */
+  text-decoration: none;
   font-style: normal;
   font-weight: normal;
   font-size: 12px;
@@ -309,5 +357,22 @@ const DropdownButton = styled.button<DropdownButtonProps>`
   :hover {
     cursor: pointer;
     opacity: 0.8;
+  }
+`;
+
+const Input = styled.input`
+  border: none;
+  border-bottom: 1px solid #18227c;
+  margin: 0;
+  height: 21px;
+  width: 100%;
+  background-color: transparent;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  color: #18227c;
+
+  :focus {
+    outline: 0;
   }
 `;

@@ -1,27 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { LeftArrowIcon, RightArrowIcon } from "../assets/icons/icons";
 
 export interface INavbarItem {
+  id?: number;
   title: string;
-
   callback: () => unknown;
 }
 
 type props = {
   items: INavbarItem[];
+  currentTaskGroup?: number;
 };
 export function Navbar(props: props): JSX.Element {
   const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    setActive(props.currentTaskGroup || 0);
+  }, [props.currentTaskGroup]);
   return (
     <MainContainer>
       <NavbarContainer>
         {props.items.length > 2 && (
           <LeftArrow
             href={"#" + active}
-            onClick={() =>
-              setActive(active - 1 < 0 ? active + props.items.length - 1 : active - 1)
-            }
+            onClick={() => {
+              props.items[
+                active - 1 < 0 ? active + props.items.length - 1 : active - 1
+              ].callback();
+              setActive(active - 1 < 0 ? active + props.items.length - 1 : active - 1);
+            }}
           >
             <LeftArrowIcon />
           </LeftArrow>
@@ -45,9 +53,12 @@ export function Navbar(props: props): JSX.Element {
         {props.items.length > 2 && (
           <RightArrow
             href={"#" + active}
-            onClick={() =>
-              setActive(active + 1 > props.items.length - 1 ? 0 : active + 1)
-            }
+            onClick={() => {
+              props.items[
+                active + 1 > props.items.length - 1 ? 0 : active + 1
+              ].callback();
+              setActive(active + 1 > props.items.length - 1 ? 0 : active + 1);
+            }}
           >
             <RightArrowIcon />
           </RightArrow>
