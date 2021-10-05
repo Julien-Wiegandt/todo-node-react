@@ -256,12 +256,14 @@ export function Tasks() {
             <DropdownButton onClick={() => setModalOpen(true)}>Add a list</DropdownButton>
             <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} width="30%">
               <form onSubmit={(event) => handleAddTaskGroup(event)}>
-                <Input
-                  type="text"
-                  autoFocus
-                  value={taskGroupTitle}
-                  onChange={(event) => setTaskGroupTitle(event.target.value)}
-                />
+                {modalOpen && (
+                  <Input
+                    type="text"
+                    autoFocus
+                    value={taskGroupTitle}
+                    onChange={(event) => setTaskGroupTitle(event.target.value)}
+                  />
+                )}
               </form>
             </Modal>
           </DropdownMenu>
